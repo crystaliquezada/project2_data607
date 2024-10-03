@@ -1,0 +1,119 @@
+---
+title: "Project 2_Data 607"
+author: "Crystal Quezada"
+date: "2024-10-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Supermarket Sales
+
+```{r read supermarket data}
+supermarketdata <- read.csv("/Users/crys/Downloads/SuperMarket Analysis.csv")
+```
+
+After loading in our data from a csv file, we're going to clean it up by isolating relevant variables.
+
+```{r transform supermarket}
+clean_supermarket <- supermarketdata %>% 
+  select("City","Gender", "Product.line", "Sales", "gross.income", "Rating") 
+```
+
+The first analysis focuses on supermarket sales by city and product line. Naypyitaw recorded the highest number of sales, with the majority of purchases in the food and beverages category. It also saw the lowest sales in home and lifestyle, as well as sports and travel. In contrast, consumers in Yangon spent most of their money on home and lifestyle products. Mandalay demonstrated a more balanced distribution of purchases across all product lines, though sports and travel products saw the highest sales.
+
+```{r ggplot supermarket city v sales}
+ggplot(clean_supermarket, aes(x = City, y = gross.income, fill = Product.line)) +
+  geom_col () +
+  theme_minimal() +
+  labs(title = "Supermarket Sales by City", 
+       x = "City", 
+       y = "Sales")
+```
+
+Overall, women spent the most money across all cities and product lines. However, men outspent women in electronics, health and beauty, and home and lifestyle categories in Naypyitaw, as well as in fashion accessories and sports and travel in Yangon. This is notable, particularly because women are traditionally known for dominating fashion accessories purchases, making the higher spending by men in this category surprising.
+
+```{r supermarket city sales by gender and product}
+ggplot(clean_supermarket, aes(x = City, y = Sales, fill = Gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Product.line) +
+  theme(
+    axis.text.x = element_text(size = 5.5),
+  )
+```
+
+# World Population
+
+```{r read worldpop data }
+worldpopulation <- read.csv("/Users/crys/Downloads/world_population.csv")
+```
+
+The second dataset we are transforming focuses on global population data. Due to the large volume of information, we are narrowing our analysis to country territories, growth rates, and population density per sq kilometer, specifically filtering for countries with a population density greater than 750 people per sq kilometer.
+
+```{r transform worldpop}
+clean_worldpopulation <- worldpopulation %>% 
+  select("Country.Territory","Growth.Rate", "Density..per.km..") %>% 
+  filter(Density..per.km.. > 750)
+```
+
+Macau stands out significantly, with a staggering population density of over 25,000 people per square kilometer. I would have expected such high numbers from more prominent regions like Hong Kong or Singapore, though their densities reach around 7,500  and 10,000 people per sq kilometer respectively. It was also surprising to see smaller territories like Sint Maarten with high population density considering it does not come to mind in conversations about populations, but given its small size, this makes sense.
+
+```{r worldpop density}
+ggplot(clean_worldpopulation, aes(x = reorder(Country.Territory, Density..per.km..), y = Density..per.km..)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  labs(title = "Population Density per Country Territory", x = "Country Territory", y = "Density per km²") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Mayotte, despite being one of the less densely populated territories in our previous analysis, has the highest growth rate. On the other hand, Monaco, the second most densely populated territory, has the lowest growth rate. This contrast between population density and growth rate adds an interesting dimension to the analysis, highlighting how different factors influence growth across regions.
+
+```{r worldpop growth rate}
+ggplot(clean_worldpopulation, aes(x = Country.Territory, y = Growth.Rate)) +
+  geom_point(color = "violet", size = 3) +
+  labs(title = "Country Growth Rate", x = "Country", y = "Growth Rate (%)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+# Motor Vehicle Collisions
+
+```{r read motorcrash data}
+motorcrashes <- read.csv("/Users/crys/Downloads/Motor_Vehicle_Collisions_-_Crashes_20240930.csv")
+```
+
+Lastly, we are examining motor vehicle crashes by borough. Since the dataset contains many missing values, we first clean and refine the data focusing on the number of people and motorists injured to ensure accurate insights.
+
+```{r clean motor data}
+clean_motorcrashes <- motorcrashes %>% 
+  select("BOROUGH", "NUMBER.OF.PERSONS.INJURED", "NUMBER.OF.MOTORIST.INJURED", "CONTRIBUTING.FACTOR.VEHICLE.1", ) %>% 
+  filter(NUMBER.OF.PERSONS.INJURED > 0, BOROUGH != "")
+```
+
+Interestingly, Staten Island and Manhattan report nearly identical injury counts, despite Manhattan being the largest borough and Staten Island the smallest in terms of population. Conversely, Brooklyn, which ranks as the second largest borough, has the highest number of injuries, which aligns with expectations based on its population size.
+
+```{r injured data}
+ggplot(clean_motorcrashes, aes(x = BOROUGH, y = NUMBER.OF.PERSONS.INJURED)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "pink")
+```
+
+Surprisingly, Manhattan has the fewest incidents involving motorists, which is unexpected given its high population density and heavy traffic. Meanwhile, Brooklyn continues to record the highest number of injuries among motorists.
+
+```{r injured motorist data}
+ggplot(clean_motorcrashes, aes(x = BOROUGH, y = NUMBER.OF.MOTORIST.INJURED)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "blue")
+```
+
+
+
+
+
+
+
+
+
+
+
+
